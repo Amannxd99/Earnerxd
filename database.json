@@ -1,0 +1,35 @@
+{
+  "users": [
+    {
+      "username": "demoUser",
+      "email": "demo@example.com",
+      "password": "password123",
+      "referCode": "AB12",
+      "referredBy": null,
+      "wallet": 150,
+      "spinsToday": 0,
+      "scratchCards": 3,
+      "tasksCompleted": [],
+      "tournamentsJoined": [],
+      "referrals": [],
+      "transactions": [
+        {
+          "type": "Welcome Bonus",
+          "amount": 150,
+          "date": "2025-10-15T10:00:00Z"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "tournaments": [],
+  "spinPrizes": [
+    { "label": "10 Coins", "value": 10 },
+    { "label": "20 Coins", "value": 20 },
+    { "label": "Sorry!", "value": 0 },
+    { "label": "30 Coins", "value": 30 },
+    { "label": "100 Coins", "value": 100 },
+    { "label": "5 Rs UPI", "value": "upi_5" }
+  ],
+  "leaderboard": []
+}
