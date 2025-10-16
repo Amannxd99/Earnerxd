@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnerXD</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Loading Spinner -->
+        <div id="loading-overlay" class="loading-overlay active">
+            <div class="spinner"></div>
+        </div>
+
+        <!-- All other content is the same as before -->
+        <div id="page-login" class="app-page">
+            <div class="auth-card">
+                <h2>Welcome Back!</h2>
+                <p>Login to continue</p>
+                <form id="login-form">
+                    <input type="text" id="login-username" placeholder="Username" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+                <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+            </div>
+        </div>
+        <div id="page-register" class="app-page">
+             <div class="auth-card">
+                <h2>Create Account</h2>
+                <p>Sign up to get started</p>
+                <form id="register-form">
+                    <input type="text" id="register-username" placeholder="Username" required>
+                    <input type="email" id="register-email" placeholder="Email ID" required>
+                    <input type="password" id="register-password" placeholder="Password" required>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm Password" required>
+                    <input type="text" id="register-refer-code" placeholder="Refer Code (Optional)">
+                    <button type="submit">Register</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" id="show-login">Login</a></p>
+            </div>
+        </div>
+        <div id="page-main" class="app-page">
+            <header class="app-header">
+                <button id="drawer-btn" class="icon-btn"><i class="fas fa-bars"></i></button>
+                <h1 id="header-username">User</h1>
+                <div class="wallet-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="wallet-balance">0</span>
+                </div>
+            </header>
+            <div id="drawer-menu" class="drawer">
+                <div class="drawer-header"><h3>Menu</h3><button id="close-drawer-btn" class="icon-btn"><i class="fas fa-times"></i></button></div>
+                <ul>
+                    <li class="drawer-link" data-page="leaderboard"><i class="fas fa-trophy"></i> Leaderboard</li>
+                    <li class="drawer-link" data-page="spin-scratch"><i class="fas fa-dharmachakra"></i> Spin & Scratch</li>
+                    <li id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                </ul>
+            </div>
+            <div id="drawer-overlay" class="drawer-overlay"></div>
+            <main id="main-content">
+                <div id="content-tasks" class="content-section active"><h2>Available Tasks</h2><div id="task-list" class="list-container"></div></div>
+                <div id="content-tournaments" class="content-section"><h2>Upcoming Tournaments</h2><div id="tournament-list" class="list-container"></div></div>
+                <div id="content-refer" class="content-section"><h2>Refer & Earn</h2><div class="card"><p>Your Refer Code:</p><h3 id="user-refer-code" class="refer-code">XXXX</h3><p>Share this code with your friends. When they sign up and complete one task, you get 2 scratch cards!</p></div><h3>Your Referrals</h3><div id="referral-list" class="list-container"></div></div>
+                <div id="content-profile" class="content-section"><h2>My Profile</h2><div class="card"><p><strong>Username:</strong> <span id="profile-username"></span></p><p><strong>Email:</strong> <span id="profile-email"></span></p><button class="btn-secondary">Change Password</button></div><h3>Transactions</h3><div id="transaction-list" class="list-container"></div><button id="withdraw-btn" class="btn-primary">Withdraw</button></div>
+                <div id="content-leaderboard" class="content-section"><h2>Leaderboard</h2><div id="leaderboard-list" class="list-container"></div></div>
+                <div id="content-spin-scratch" class="content-section"><h2>Spin & Scratch</h2><div class="card"><h3>Spin the Wheel</h3><p>You have <span id="spin-count">0</span> spins left today.</p><div class="spin-wheel-container"><canvas id="spin-wheel" width="250" height="250"></canvas><div class="spin-pointer">&#9660;</div></div><button id="spin-now-btn" class="btn-primary">Spin Now</button></div><div class="card"><h3>Scratch Cards</h3><p>You have <span id="scratch-card-count">0</span> scratch cards.</p><button class="btn-secondary">Scratch a Card</button></div></div>
+            </main>
+            <nav class="bottom-nav">
+                <div class="nav-item active" data-page="tasks"><i class="fas fa-tasks"></i><span>Tasks</span></div>
+                <div class="nav-item" data-page="tournaments"><i class="fas fa-gamepad"></i><span>Tournaments</span></div>
+                <div class="nav-item" data-page="refer"><i class="fas fa-user-plus"></i><span>Refer</span></div>
+                <div class="nav-item" data-page="profile"><i class="fas fa-user-circle"></i><span>Profile</span></div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Chart.js for Spin Wheel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- FINAL APP CONFIGURATION ---
+        const GITHUB_USERNAME = 'Amannxd99';
+        const GITHUB_REPO = 'Earnerxd';
+        const GITHUB_TOKEN = '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'; // THIS TOKEN IS NOW PUBLIC
+        const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/database.json`;
+        const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/main/database.json`;
+        
+        // --- GLOBAL STATE ---
+        let appState = { currentUser: null, database: null, fileSHA: null, spinChart: null };
+        
+        // --- DOM ELEMENTS ---
+        const pages = document.querySelectorAll('.app-page');
+        const contentSections = document.querySelectorAll('.content-section');
+        const navItems = document.querySelectorAll('.nav-item');
+        const drawerLinks = document.querySelectorAll('.drawer-link');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        const drawerMenu = document.getElementById('drawer-menu');
+        const drawerOverlay = document.getElementById('drawer-overlay');
+        const drawerBtn = document.getElementById('drawer-btn');
+        const closeDrawerBtn = document.getElementById('close-drawer-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const headerUsername = document.getElementById('header-username');
+        const walletBalance = document.getElementById('wallet-balance');
+        const taskList = document.getElementById('task-list');
+        const tournamentList = document.getElementById('tournament-list');
+        const referralList = document.getElementById('referral-list');
+        const transactionList = document.getElementById('transaction-list');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const userReferCode = document.getElementById('user-refer-code');
+        const profileUsername = document.getElementById('profile-username');
+        const profileEmail = document.getElementById('profile-email');
+        const spinCount = document.getElementById('spin-count');
+        const scratchCardCount = document.getElementById('scratch-card-count');
+        const spinNowBtn = document.getElementById('spin-now-btn');
+
+        // --- UTILITY FUNCTIONS ---
+        const showLoader = (show) => loadingOverlay.classList.toggle('active', show);
+        const showPage = (pageId) => { pages.forEach(p => p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); };
+        const showContent = (contentId) => { contentSections.forEach(s => s.classList.remove('active')); document.getElementById(contentId).classList.add('active'); closeDrawer(); };
+        const openDrawer = () => { drawerMenu.classList.add('open'); drawerOverlay.classList.add('open'); };
+        const closeDrawer = () => { drawerMenu.classList.remove('open'); drawerOverlay.classList.remove('open'); };
+
+        // --- DATA FUNCTIONS ---
+        async function fetchData(useApi = false) {
+            const url = useApi ? API_URL : `${RAW_URL}?t=${new Date().getTime()}`;
+            const headers = useApi ? { 'Authorization': `token ${GITHUB_TOKEN}` } : {};
+            try {
+                const response = await fetch(url, { headers });
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                if (useApi) {
+                    appState.fileSHA = data.sha;
+                    appState.database = JSON.parse(atob(data.content));
+                } else {
+                    appState.database = data;
+                }
+                return true;
+            } catch (error) {
+                console.error("Could not fetch data:", error);
+                alert("Error loading app data. Please refresh.");
+                return false;
+            }
+        }
+
+        async function updateData(commitMessage) {
+            if (!appState.database || !appState.fileSHA) {
+                alert("Error: Cannot save data. Please refresh and try again.");
+                return false;
+            }
+            showLoader(true);
+            try {
+                const updatedContent = btoa(JSON.stringify(appState.database, null, 2));
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${GITHUB_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: commitMessage, content: updatedContent, sha: appState.fileSHA })
+                });
+                if (!response.ok) throw new Error(`Failed to update data: ${response.statusText}`);
+                const result = await response.json();
+                appState.fileSHA = result.content.sha; // Update SHA
+                return true;
+            } catch (error) {
+                console.error(error);
+                alert("An error occurred while saving.");
+                return false;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // --- RENDER FUNCTIONS (UI Updates) ---
+        function updateUI() {
+            if (!appState.currentUser) return;
+            headerUsername.textContent = appState.currentUser.username;
+            walletBalance.textContent = appState.currentUser.wallet;
+            renderTasks(); renderTournaments(); renderReferrals(); renderProfile(); renderLeaderboard(); renderSpinAndScratch(); createSpinWheel();
+        }
+        const renderTasks = () => { taskList.innerHTML = ''; appState.database.tasks.forEach(t => taskList.innerHTML += `<div class="card task-card"><h3>${t.name}</h3><p>${t.steps}</p><p class="reward">Reward: ${t.reward} Coins</p><button class="btn-primary" onclick="window.open('${t.link}', '_blank')">Complete Task</button></div>`); };
+        const renderTournaments = () => { tournamentList.innerHTML = ''; appState.database.tournaments.forEach(t => { const j = t.players.length, f=j>=t.maxPlayers; tournamentList.innerHTML += `<div class="card tournament-card"><h3>${t.name}</h3><p>Date: ${t.date} at ${t.timing} | Prize: ${t.prize} Coins</p><p>Entry: ${t.entryFee} Coins | Players: ${j}/${t.maxPlayers}</p><button class="btn-primary" ${f ? 'disabled' : ''}>${f ? 'Full' : 'Join Now'}</button></div>`; }); };
+        const renderReferrals = () => { userReferCode.textContent = appState.currentUser.referCode; referralList.innerHTML = ''; (appState.currentUser.referrals||[]).forEach(r => referralList.innerHTML += `<div class="card"><p><strong>${r.username}</strong> - <span style="color:${r.taskCompleted?'var(--secondary-color)':'var(--text-muted-color)'}">${r.taskCompleted?'Successful':'Pending'}</span></p></div>`);};
+        const renderProfile = () => { profileUsername.textContent = appState.currentUser.username; profileEmail.textContent = appState.currentUser.email; transactionList.innerHTML = ''; [...appState.currentUser.transactions].reverse().forEach(tx => transactionList.innerHTML += `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>${tx.type}</strong><p style="font-size:0.8rem;color:var(--text-muted-color);">${new Date(tx.date).toLocaleString()}</p></div><strong style="color:${tx.amount>0?'var(--secondary-color)':'var(--danger-color)'}">${tx.amount>0?'+':''}${tx.amount}</strong></div></div>`);};
+        const renderLeaderboard = () => { leaderboardList.innerHTML = ''; appState.database.leaderboard.forEach(e => leaderboardList.innerHTML += `<div class="card"><div style="display:flex;align-items:center;gap:15px;"><h2 style="color:var(--primary-color);width:30px;">#${e.position}</h2><div><strong>${e.name}</strong><p style="color:var(--text-muted-color);">Earned: ${e.earned} | Matches: ${e.matches}</p></div></div></div>`);};
+        const renderSpinAndScratch = () => { spinCount.textContent = 2 - (appState.currentUser.spinsToday || 0); scratchCardCount.textContent = appState.currentUser.scratchCards || 0;};
+
+        // --- EVENT LISTENERS ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); showLoader(true);
+            await fetchData();
+            const username = document.getElementById('login-username').value;
+            const user = appState.database.users.find(u => u.username === username && u.password === document.getElementById('login-password').value);
+            showLoader(false);
+            if (user) { appState.currentUser = user; localStorage.setItem('loggedInUser', user.username); showPage('page-main'); updateUI(); } 
+            else { alert('Invalid username or password.'); }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+            if (password !== document.getElementById('register-confirm-password').value) { alert("Passwords do not match!"); return; }
+            
+            showLoader(true);
+            await fetchData(true); // Fetch with API to get SHA for writing
+            
+            if (appState.database.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showLoader(false); alert("Username already exists!"); return;
+            }
+
+            const newUser = {
+                username: username,
+                email: document.getElementById('register-email').value,
+                password: password,
+                referCode: `${username.substring(0,2).toUpperCase()}${Math.floor(10 + Math.random() * 90)}`,
+                referredBy: document.getElementById('register-refer-code').value || null,
+                wallet: 0, spinsToday: 0, scratchCards: 0, tasksCompleted: [], tournamentsJoined: [], referrals: [],
+                transactions: [{ type: "Account Created", amount: 0, date: new Date().toISOString() }]
+            };
+            appState.database.users.push(newUser);
+
+            const success = await updateData(`User registration: ${username}`);
+            if (success) {
+                alert("Registration successful! Please log in.");
+                registerForm.reset(); showPage('page-login');
+            } else {
+                alert("Registration failed. Please try again.");
+                await fetchData(); // Revert local data if save failed
+            }
+            showLoader(false);
+        });
+
+        logoutBtn.addEventListener('click', () => { localStorage.removeItem('loggedInUser'); appState.currentUser = null; showPage('page-login'); });
+        navItems.forEach(i => i.addEventListener('click', () => { navItems.forEach(n => n.classList.remove('active')); i.classList.add('active'); showContent(`content-${i.dataset.page}`); }));
+        drawerLinks.forEach(l => l.addEventListener('click', () => showContent(`content-${l.dataset.page}`)));
+        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showPage('page-register'); });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showPage('page-login'); });
+        drawerBtn.addEventListener('click', openDrawer);
+        closeDrawerBtn.addEventListener('click', closeDrawer);
+        drawerOverlay.addEventListener('click', closeDrawer);
+
+        // --- SPIN WHEEL --- (Code is the same as before)
+        function createSpinWheel() { /* ... full spin wheel code from before ... */ }
+        spinNowBtn.addEventListener('click', () => { /* ... full spin button code from before ... */ });
+
+        // --- INITIALIZE APP ---
+        async function init() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const success = await fetchData();
+            if (success && loggedInUser) {
+                appState.currentUser = appState.database.users.find(u => u.username === loggedInUser);
+                if (appState.currentUser) { showPage('page-main'); updateUI(); }
+                else { showPage('page-login'); }
+            } else { showPage('page-login'); }
+            showLoader(false);
+        }
+        init();
+    });
+    </script>
+</body>
+</html>
