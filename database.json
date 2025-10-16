@@ -1,4 +1,4 @@
-{
+
       "users": [
         {
           "username": "demoUser",
@@ -28,4 +28,4 @@
         {"label": "5 Rs UPI", "value": "upi_5"}
       ],
       "leaderboard": []
-    }
+    
